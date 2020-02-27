@@ -15,7 +15,7 @@ axios.defaults.headers ={
 }
 
 axios.defaults.baseURL = "http://140.143.186.207:8091";//设置初始URL
-
+// axios.defaults.baseURL = "http://220.173.103.143:8091";// 学校服务器
 axios.defaults.withCredentials=true;  // 跨域携带cookie
 
 //挂在在vue的原型上
