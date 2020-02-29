@@ -55,7 +55,7 @@
         <van-field v-model="form.intro" placeholder="请输入" />
         <div style="margin: 16px;">
           <!-- <van-button round block type="info" native-type="submit">提交</van-button> -->
-          <van-button round block type="info" @click="submitForm()">提交</van-button>
+          <van-button round block type="info" @click="submitForm()" :disabled="disabledButton">提交</van-button>
         </div>
       </template>
     </van-form>
@@ -91,7 +91,8 @@
             return {
                 showXinxi: false,
                 form: {},
-                show: false
+                show: false,
+                disabledButton:false,
                 //    currentDate: new Date()
             };
         },
@@ -110,12 +111,16 @@
                 this.$set(this.form, "workType", ""); //岗位
                 this.$set(this.form, "reason", ""); //无法返回原因
                 this.$set(this.form, "returnLiuZhou", ""); //本周是否返柳
-                this.$set(this.form, "returnLiuZhouTime", ""); //c 
+                this.$set(this.form, "returnLiuZhouTime", ""); //c
                 this.$set(this.form, "returnLiuZhouWay", ""); //计划返柳交通工具
                 this.$set(this.form, "intro", ""); //备注
             },
             submitForm() {
                 //将更新后的值传到服务端保存
+                let validate=true;
+
+                if(validate){//如果验证通过
+                this.disabledButton=true;
                 //提交表单事件
                 this.$axios
                     .post("/api/frontdesk/strandQuestionnaire", JSON.stringify(this.form))
@@ -125,18 +130,19 @@
                         console.log(response.data);
                         if (msg.code == 0) {
                             //如果提交成功
-                            // this.$messagebox("提示", "提交成功,谢谢您的参与").then(action => {
-                            //   //跳转到成功并感谢页面
-                            //    this.$router.push("/Success");
-                            // });
-                            //  this.$toast('提示文案');Toast.success('提交成功,谢谢您的参与');
-                            this.$toast.success("提交成功,谢谢您的参与");
-                            this.$router.push("/Success");
+                            this.$dialog.alert({
+                                title:'系统提示',
+                                message:'提交成功！'
+                            }).then(()=>{
+                                this.$router.push("/Success");
+                            })
                         } else {
+                          this.disabledButton=false;
                             //如果提交失败
                             this.$toast(msg.msg);
                         }
                     });
+                }
             },
             // 校验函数返回 true 表示校验通过，false 表示不通过
             phoneValidator(val) {
@@ -153,9 +159,9 @@
             // }
 
           checkCard() { //根据学号或工号显示后面的字段
-               
+
                     this.getTeacher();
-               
+
             },
             getTeacher() {
                 if (this.form.teacherNumber.length>=5) {
